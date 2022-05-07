@@ -100,7 +100,6 @@ void ImageViewer::setImage(const QImage &newImage)
     scaleFactor = 1.0;
 
     scrollArea->setVisible(true);
-    printAct->setEnabled(true);
     fitToWindowAct->setEnabled(true);
     updateActions();
 
@@ -123,11 +122,6 @@ bool ImageViewer::saveFile(const QString &fileName)
     const QString message = tr("Wrote \"%1\"").arg(QDir::toNativeSeparators(fileName));
     statusBar()->showMessage(message);
     return true;
-}
-
-void ImageViewer::print()
-{
-    Q_ASSERT(imageLabel->pixmap());
 }
 
 void ImageViewer::zoomIn()
@@ -231,10 +225,6 @@ void ImageViewer::createActions()
     saveAsAct = fileMenu->addAction(tr("&Save As..."), this, &ImageViewer::saveAs);
     saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
     saveAsAct->setEnabled(false);
-
-    printAct = fileMenu->addAction(tr("&Print..."), this, &ImageViewer::print);
-    printAct->setShortcut(QKeySequence::Print);
-    printAct->setEnabled(false);
 
     fileMenu->addSeparator();
 
