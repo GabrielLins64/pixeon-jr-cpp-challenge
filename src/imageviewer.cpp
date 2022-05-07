@@ -56,6 +56,14 @@ void ImageViewer::open()
     while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}
 }
 
+void ImageViewer::close()
+{
+    delete image;
+    image = new QImage();
+    scrollArea->setVisible(false);
+    updateActions();
+}
+
 void ImageViewer::save()
 {
     while (!saveFile(this->currentFileName)) {}
@@ -94,17 +102,17 @@ bool ImageViewer::loadFile(const QString &fileName)
 
     const QString message = tr("Opened \"%1\", %2x%3, Depth: %4")
                                 .arg(QDir::toNativeSeparators(fileName))
-                                .arg(image.width())
-                                .arg(image.height())
-                                .arg(image.depth());
+                                .arg(image->width())
+                                .arg(image->height())
+                                .arg(image->depth());
     statusBar()->showMessage(message);
     return true;
 }
 
 void ImageViewer::setImage(const QImage &newImage)
 {
-    image = newImage;
-    imageLabel->setPixmap(QPixmap::fromImage(image));
+    image = new QImage(newImage);
+    imageLabel->setPixmap(QPixmap::fromImage(*image));
     scaleFactor = 1.0;
 
     scrollArea->setVisible(true);
@@ -119,7 +127,7 @@ bool ImageViewer::saveFile(const QString &fileName)
 {
     QImageWriter writer(fileName);
 
-    if (!writer.write(image))
+    if (!writer.write(*image))
     {
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
                                  tr("Cannot write %1: %2")
@@ -160,7 +168,7 @@ void ImageViewer::fitToWindow()
 void ImageViewer::copy()
 {
 #ifndef QT_NO_CLIPBOARD
-    QGuiApplication::clipboard()->setImage(image);
+    QGuiApplication::clipboard()->setImage(*image);
 #endif // !QT_NO_CLIPBOARD
 }
 
@@ -226,17 +234,20 @@ void ImageViewer::createActions()
     QAction *openAct = fileMenu->addAction(tr("&Open..."), this, &ImageViewer::open);
     openAct->setShortcut(QKeySequence::Open);
 
-    saveAct = fileMenu->addAction(tr("&Save"), this, &ImageViewer::save);
+    saveAct = fileMenu->addAction(tr("Save"), this, &ImageViewer::save);
     saveAct->setShortcut(tr("Ctrl+S"));
     saveAct->setEnabled(false);
 
-    saveAsAct = fileMenu->addAction(tr("&Save As..."), this, &ImageViewer::saveAs);
+    saveAsAct = fileMenu->addAction(tr("Save As..."), this, &ImageViewer::saveAs);
     saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
     saveAsAct->setEnabled(false);
 
+    closeAct = fileMenu->addAction(tr("Close image"), this, &ImageViewer::close);
+    closeAct->setEnabled(false);
+
     fileMenu->addSeparator();
 
-    QAction *exitAct = fileMenu->addAction(tr("E&xit"), this, &QWidget::close);
+    QAction *exitAct = fileMenu->addAction(tr("Exit"), this, &QWidget::close);
     exitAct->setShortcut(tr("Ctrl+Q"));
 
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
@@ -277,9 +288,10 @@ void ImageViewer::createActions()
 
 void ImageViewer::updateActions()
 {
-    saveAct->setEnabled(!image.isNull());
-    saveAsAct->setEnabled(!image.isNull());
-    copyAct->setEnabled(!image.isNull());
+    saveAct->setEnabled(!image->isNull());
+    saveAsAct->setEnabled(!image->isNull());
+    closeAct->setEnabled(!image->isNull());
+    copyAct->setEnabled(!image->isNull());
     zoomInAct->setEnabled(!fitToWindowAct->isChecked());
     zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
     normalSizeAct->setEnabled(!fitToWindowAct->isChecked());

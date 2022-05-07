@@ -31,6 +31,12 @@ private slots:
     void open();
 
     /**
+     * @brief Close the current viewing image
+     * 
+     */
+    void close();
+
+    /**
      * @brief Save the current image at the same opened file
      * 
      */
@@ -129,7 +135,7 @@ private:
      */
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
 
-    QImage image;
+    QImage *image;
     QString currentFileName;
     QLabel *imageLabel;
     QScrollArea *scrollArea;
@@ -137,6 +143,7 @@ private:
 
     QAction *saveAct;
     QAction *saveAsAct;
+    QAction *closeAct;
     QAction *copyAct;
     QAction *zoomInAct;
     QAction *zoomOutAct;
