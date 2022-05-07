@@ -9,6 +9,14 @@
 ImageViewer::ImageViewer()
     : imageLabel(new QLabel), scrollArea(new QScrollArea), scaleFactor(1)
 {
+    const QString mainCss = "QMainWindow {"
+                            "    background-image: url('assets/images/logo-pixeon.png');"
+                            "    background-color: #ebebeb;"
+                            "    background-repeat: no-repeat;"
+                            "    background-position: center center"
+                            "}";
+    this->setStyleSheet(mainCss);
+
     imageLabel->setBackgroundRole(QPalette::Base);
     imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     imageLabel->setScaledContents(true);
