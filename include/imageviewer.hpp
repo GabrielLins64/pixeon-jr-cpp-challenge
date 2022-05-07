@@ -17,6 +17,7 @@ public:
 
 private slots:
     void open();
+    void save();
     void saveAs();
     void print();
     void copy();
@@ -37,6 +38,7 @@ private:
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
 
     QImage image;
+    QString currentFileName;
     QLabel *imageLabel;
     QScrollArea *scrollArea;
     double scaleFactor;
@@ -45,6 +47,7 @@ private:
     QPrinter printer;
 #endif
 
+    QAction *saveAct;
     QAction *saveAsAct;
     QAction *printAct;
     QAction *copyAct;

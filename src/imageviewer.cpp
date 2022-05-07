@@ -23,7 +23,7 @@ ImageViewer::ImageViewer()
     resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
 }
 
-static void initializeImageFileDialog(QFileDialog &dialog, QFileDialog::AcceptMode acceptMode)
+static void initializeImageFileDialog(QFileDialog &dialog)
 {
     static bool firstDialog = true;
 
@@ -35,43 +35,45 @@ static void initializeImageFileDialog(QFileDialog &dialog, QFileDialog::AcceptMo
     }
 
     QStringList mimeTypeFilters;
-    const QByteArrayList supportedMimeTypes = acceptMode == QFileDialog::AcceptOpen
-                                                  ? QImageReader::supportedMimeTypes()
-                                                  : QImageWriter::supportedMimeTypes();
+    const QByteArrayList supportedMimeTypes = QImageReader::supportedMimeTypes();
     foreach (const QByteArray &mimeTypeName, supportedMimeTypes)
         mimeTypeFilters.append(mimeTypeName);
     mimeTypeFilters.sort();
 
     dialog.setMimeTypeFilters(mimeTypeFilters);
     dialog.selectMimeTypeFilter("image/jpeg");
-
-    if (acceptMode == QFileDialog::AcceptSave)
-        dialog.setDefaultSuffix("jpg");
 }
 
 void ImageViewer::open()
 {
     QFileDialog dialog(this, tr("Open File"));
-    initializeImageFileDialog(dialog, QFileDialog::AcceptOpen);
+    initializeImageFileDialog(dialog);
 
-    while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first()))
-    {
-    }
+    while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}
+}
+
+void ImageViewer::save()
+{
+    while (!saveFile(this->currentFileName)) {}
 }
 
 void ImageViewer::saveAs()
 {
-    QFileDialog dialog(this, tr("Save File As"));
-    initializeImageFileDialog(dialog, QFileDialog::AcceptSave);
+    QFileDialog dialog(this);
+    dialog.setDefaultSuffix("jpg");
+    QString saveFileName = dialog.getSaveFileName(this, "Save File As", this->currentFileName);
 
-    while (dialog.exec() == QDialog::Accepted && !saveFile(dialog.selectedFiles().first()))
-    {
-    }
+    if(saveFileName.isNull())
+        return;
+
+    while (!saveFile(saveFileName)) {}
 }
 
 bool ImageViewer::loadFile(const QString &fileName)
 {
     QImageReader reader(fileName);
+    this->currentFileName = fileName;
+
     reader.setAutoTransform(true);
     const QImage newImage = reader.read();
     if (newImage.isNull())
@@ -226,8 +228,12 @@ void ImageViewer::createActions()
     QAction *openAct = fileMenu->addAction(tr("&Open..."), this, &ImageViewer::open);
     openAct->setShortcut(QKeySequence::Open);
 
+    saveAct = fileMenu->addAction(tr("&Save"), this, &ImageViewer::save);
+    saveAct->setShortcut(tr("Ctrl+S"));
+    saveAct->setEnabled(false);
+
     saveAsAct = fileMenu->addAction(tr("&Save As..."), this, &ImageViewer::saveAs);
-    saveAsAct->setShortcut(tr("Ctrl+S"));
+    saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
     saveAsAct->setEnabled(false);
 
     printAct = fileMenu->addAction(tr("&Print..."), this, &ImageViewer::print);
@@ -277,6 +283,7 @@ void ImageViewer::createActions()
 
 void ImageViewer::updateActions()
 {
+    saveAct->setEnabled(!image.isNull());
     saveAsAct->setEnabled(!image.isNull());
     copyAct->setEnabled(!image.isNull());
     zoomInAct->setEnabled(!fitToWindowAct->isChecked());
