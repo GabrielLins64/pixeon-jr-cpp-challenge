@@ -34,11 +34,7 @@ static void initializeImageFileDialog(QFileDialog &dialog)
         dialog.setDirectory(picturesLocations.isEmpty() ? QDir::currentPath() : picturesLocations.last());
     }
 
-    QStringList mimeTypeFilters;
-    const QByteArrayList supportedMimeTypes = QImageReader::supportedMimeTypes();
-    foreach (const QByteArray &mimeTypeName, supportedMimeTypes)
-        mimeTypeFilters.append(mimeTypeName);
-    mimeTypeFilters.sort();
+    QStringList mimeTypeFilters({"image/jpeg", "image/bmp", "image/png"});
 
     dialog.setMimeTypeFilters(mimeTypeFilters);
     dialog.selectMimeTypeFilter("image/jpeg");
