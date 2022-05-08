@@ -3,6 +3,7 @@
 #include "rescaledialog.h"
 #include "brightnessdialog.h"
 #include "contrastdialog.h"
+#include "texts.hpp"
 #include <QGuiApplication>
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -22,7 +23,7 @@ ImageViewer::ImageViewer()
     createActions();
     resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
 
-    statusBar()->showMessage("Welcome to the Pixeon Challenge's Image Viewer!", 3000);
+    statusBar()->showMessage(WELCOME_MSG, 3000);
 }
 
 void ImageViewer::renderWorkArea()
@@ -80,7 +81,7 @@ static void initializeImageFileDialog(QFileDialog &dialog)
 
 void ImageViewer::open()
 {
-    QFileDialog dialog(this, tr("Open File"));
+    QFileDialog dialog(this, tr(OPEN_FILE_MSG));
     initializeImageFileDialog(dialog);
 
     while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}
@@ -117,7 +118,7 @@ void ImageViewer::save()
 void ImageViewer::saveAs()
 {
     QFileDialog dialog(this);
-    QString saveFilePath = dialog.getSaveFileName(this, "Save File As", this->currentFileName);
+    QString saveFilePath = dialog.getSaveFileName(this, SAVE_FILE_AS_MSG, this->currentFileName);
 
     // Dealing with possible filename changing
     auto tmpImage = images[currentFileName];
@@ -141,7 +142,7 @@ bool ImageViewer::loadFile(const QString &filePath)
     if (newImage.isNull())
     {
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
-                                 tr("Cannot load %1: %2")
+                                 tr("Não foi possível carregar o arquivo %1: %2")
                                      .arg(QDir::toNativeSeparators(filePath), reader.errorString()));
         return false;
     }
@@ -159,7 +160,7 @@ bool ImageViewer::loadFile(const QString &filePath)
 
     setWindowFilePath(filePath);
 
-    const QString message = tr("Opened \"%1\", %2x%3, Depth: %4")
+    const QString message = tr("Arquivo \"%1\" aberto, %2x%3, Depth: %4")
                                 .arg(QDir::toNativeSeparators(filePath))
                                 .arg(image->width())
                                 .arg(image->height())
@@ -199,12 +200,12 @@ bool ImageViewer::saveFile(const QString &fileName)
     if (!writer.write(*image))
     {
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
-                                 tr("Cannot write %1: %2")
+                                 tr("Não foi possível escrever o arquivo \"%1\": %2")
                                      .arg(QDir::toNativeSeparators(fileName)),
                                  writer.errorString());
         return false;
     }
-    const QString message = tr("Wrote \"%1\"").arg(QDir::toNativeSeparators(fileName));
+    const QString message = tr("Aquivo \"%1\" salvo com sucesso!").arg(QDir::toNativeSeparators(fileName));
     statusBar()->showMessage(message);
     return true;
 }
@@ -263,13 +264,13 @@ void ImageViewer::paste()
     const QImage newImage = clipboardImage();
     if (newImage.isNull())
     {
-        statusBar()->showMessage(tr("No image in clipboard"));
+        statusBar()->showMessage(tr(NO_IMG_IN_CLIPBOARD_MSG));
     }
     else
     {
         setImage(newImage);
         setWindowFilePath(QString());
-        const QString message = tr("Obtained image from clipboard, %1x%2, Depth: %3")
+        const QString message = tr(IMG_FROM_CLIPBOARD_MSG)
                                     .arg(newImage.width())
                                     .arg(newImage.height())
                                     .arg(newImage.depth());
@@ -281,102 +282,99 @@ void ImageViewer::paste()
 void ImageViewer::about()
 {
     QMessageBox::about(this,
-                       tr("About Image Viewer"),
-                       tr("<p>The <b>Image Viewer</b> example shows how to combine QLabel "
-                          "and QScrollArea to display an image. QLabel is typically used "
-                          "for displaying a text, but it can also display an image. "
-                          "QScrollArea provides a scrolling view around another widget. "
-                          "If the child widget exceeds the size of the frame, QScrollArea "
-                          "automatically provides scroll bars. </p><p>The example "
-                          "demonstrates how QLabel's ability to scale its contents "
-                          "(QLabel::scaledContents), and QScrollArea's ability to "
-                          "automatically resize its contents "
-                          "(QScrollArea::widgetResizable), can be used to implement "
-                          "zooming and scaling features. </p><p>In addition the example "
-                          "shows how to use QPainter to print an image.</p>"));
+                       tr("Sobre o visualizador de imagens"),
+                       tr("<p>Este programa foi desenvolvido para o desafio do processo seletivo para "
+                          "desenvolvedor júnior C++ da <a href='https://www.pixeon.com/'>Pixeon</a>. "
+                          "Neste visualizador de imagens é possível abrir várias imagens, "
+                          "nos formatos BMP, JPEG ou PNG. Bem como algumas operações de "
+                          "visualização, como o <i>Zoom</i>, \"Encaixar na tela\" e voltar ao "
+                          "tamanho original. Também existem operações de edição em cima das imagens, "
+                          "como: redimensionamento, rotação, ajuste de brilho e ajuste de contraste. "
+                          "Após a modificação da imagem, é possível salvá-la.</p><br>"
+                          "<b>Desenvolvedor: </b><a href='https://github.com/GabrielLins64'>Gabriel Furtado Lins Melo</a><br>"
+                          "<b>Contato: </b> <a href='https://wa.me/5585989568679'>(85) 98956-8679</a>"));
 }
 
 void ImageViewer::createActions()
 {
-    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+    QMenu *fileMenu = menuBar()->addMenu(tr(FILE_LBL));
 
-    QAction *openAct = fileMenu->addAction(tr("&Open..."), this, &ImageViewer::open);
+    QAction *openAct = fileMenu->addAction(tr(OPEN_FILE_LBL), this, &ImageViewer::open);
     openAct->setShortcut(QKeySequence::Open);
 
-    saveAct = fileMenu->addAction(tr("Save"), this, &ImageViewer::save);
+    saveAct = fileMenu->addAction(tr(SAVE_FILE_LBL), this, &ImageViewer::save);
     saveAct->setShortcut(tr("Ctrl+S"));
     saveAct->setEnabled(false);
 
-    saveAsAct = fileMenu->addAction(tr("Save As..."), this, &ImageViewer::saveAs);
+    saveAsAct = fileMenu->addAction(tr(SAVE_AS_FILE_LBL), this, &ImageViewer::saveAs);
     saveAsAct->setShortcut(tr("Ctrl+Shift+S"));
     saveAsAct->setEnabled(false);
 
-    closeAct = fileMenu->addAction(tr("Close image"), this, &ImageViewer::close);
+    closeAct = fileMenu->addAction(tr(CLOSE_IMG_LBL), this, &ImageViewer::close);
     closeAct->setEnabled(false);
 
     fileMenu->addSeparator();
 
-    QAction *exitAct = fileMenu->addAction(tr("Exit"), this, &QWidget::close);
+    QAction *exitAct = fileMenu->addAction(tr(EXIT_LBL), this, &QWidget::close);
     exitAct->setShortcut(tr("Ctrl+Q"));
 
-    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
+    QMenu *editMenu = menuBar()->addMenu(tr(EDIT_LBL));
 
-    copyAct = editMenu->addAction(tr("&Copy"), this, &ImageViewer::copy);
+    copyAct = editMenu->addAction(tr(COPY_LBL), this, &ImageViewer::copy);
     copyAct->setShortcut(QKeySequence::Copy);
     copyAct->setEnabled(false);
 
-    QAction *pasteAct = editMenu->addAction(tr("&Paste"), this, &ImageViewer::paste);
+    QAction *pasteAct = editMenu->addAction(tr(PASTE_LBL), this, &ImageViewer::paste);
     pasteAct->setShortcut(QKeySequence::Paste);
 
-    rotateClockwiseAct = editMenu->addAction(tr("Rotate Clockwise"),
+    rotateClockwiseAct = editMenu->addAction(tr(ROTATE_CW_LBL),
                                              this,
                                              &ImageViewer::rotateClockwise);
     rotateClockwiseAct->setShortcut(tr("Ctrl+R"));
     rotateClockwiseAct->setEnabled(false);
 
-    rotateCounterClockwiseAct = editMenu->addAction(tr("Rotate Counterclockwise"),
+    rotateCounterClockwiseAct = editMenu->addAction(tr(ROTATE_CCW_LBL),
                                                     this,
                                                     &ImageViewer::rotateCounterClockwise);
     rotateCounterClockwiseAct->setShortcut(tr("Ctrl+Shift+R"));
     rotateCounterClockwiseAct->setEnabled(false);
 
-    rescaleImageAct = editMenu->addAction(tr("Rescale"), this, &ImageViewer::rescaleImage);
+    rescaleImageAct = editMenu->addAction(tr(RESCALE_LBL), this, &ImageViewer::rescaleImage);
     rescaleImageAct->setShortcut(tr("Ctrl+H"));
     rescaleImageAct->setEnabled(false);
 
-    adjustImageBrightnessAct = editMenu->addAction(tr("Adjust Brightness"), this, &ImageViewer::onAdjustImageBrightness);
+    adjustImageBrightnessAct = editMenu->addAction(tr(ADJUST_BRIGHT_LBL), this, &ImageViewer::onAdjustImageBrightness);
     adjustImageBrightnessAct->setShortcut(tr("Ctrl+B"));
     adjustImageBrightnessAct->setEnabled(false);
 
-    adjustContrastAct = editMenu->addAction(tr("Adjust Contrast"), this, &ImageViewer::onAdjustContrast);
+    adjustContrastAct = editMenu->addAction(tr(ADJUST_CONTR_LBL), this, &ImageViewer::onAdjustContrast);
     adjustContrastAct->setShortcut(tr("Ctrl+T"));
     adjustContrastAct->setEnabled(false);
 
-    QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
+    QMenu *viewMenu = menuBar()->addMenu(tr(VIEW_LBL));
 
-    zoomInAct = viewMenu->addAction(tr("Zoom In (25%)"), this, &ImageViewer::zoomIn);
+    zoomInAct = viewMenu->addAction(tr(ZOOM_IN_LBL), this, &ImageViewer::zoomIn);
     zoomInAct->setShortcut(QKeySequence::ZoomIn);
     zoomInAct->setEnabled(false);
 
-    zoomOutAct = viewMenu->addAction(tr("Zoom Out (25%)"), this, &ImageViewer::zoomOut);
+    zoomOutAct = viewMenu->addAction(tr(ZOOM_OUT_LBL), this, &ImageViewer::zoomOut);
     zoomOutAct->setShortcut(QKeySequence::ZoomOut);
     zoomOutAct->setEnabled(false);
 
-    normalSizeAct = viewMenu->addAction(tr("&Normal Size"), this, &ImageViewer::normalSize);
+    normalSizeAct = viewMenu->addAction(tr(ORIGINAL_SIZE_LBL), this, &ImageViewer::normalSize);
     normalSizeAct->setShortcut(tr("Ctrl+N"));
     normalSizeAct->setEnabled(false);
 
     viewMenu->addSeparator();
 
-    fitToWindowAct = viewMenu->addAction(tr("&Fit to Window"), this, &ImageViewer::fitToWindow);
+    fitToWindowAct = viewMenu->addAction(tr(FIT_WINDOW_LBL), this, &ImageViewer::fitToWindow);
     fitToWindowAct->setEnabled(false);
     fitToWindowAct->setCheckable(true);
     fitToWindowAct->setShortcut(tr("Ctrl+F"));
 
-    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+    QMenu *helpMenu = menuBar()->addMenu(tr(HELP_LBL));
 
-    helpMenu->addAction(tr("&About"), this, &ImageViewer::about);
-    helpMenu->addAction(tr("About &Qt"), &QApplication::aboutQt);
+    helpMenu->addAction(tr(ABOUT_LBL), this, &ImageViewer::about);
 }
 
 void ImageViewer::updateActions()
