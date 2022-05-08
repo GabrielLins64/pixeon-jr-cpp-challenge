@@ -1,2 +1,9 @@
+# Build files and configs
 build
 lib
+*.stash
+*.o
+*.exe
+
+# Environment configs
+.vscode
