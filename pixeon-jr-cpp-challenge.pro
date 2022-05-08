@@ -19,10 +19,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Input
-HEADERS += include/imageviewer.hpp
+HEADERS += include/imageviewer.hpp \
+           include/imageeditor.hpp \
+           include/rescaledialog.h \
+           include/brightnessdialog.h \
+           include/contrastdialog.h
 SOURCES += src/imageviewer.cpp \
+           src/imageeditor.cpp \
+           src/rescaledialog.cpp \
+           src/brightnessdialog.cpp \
+           src/contrastdialog.cpp \
            src/main.cpp
 
-QT += widgets
+FORMS += assets/designs/rescaledialog.ui \
+         assets/designs/brightnessdialog.ui \
+         assets/designs/contrastdialog.ui
+
+QT += widgets core gui
 requires(qtConfig(filedialog))
 qtHaveModule(printsupport): QT += printsupport

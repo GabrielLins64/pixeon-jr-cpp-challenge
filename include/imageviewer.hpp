@@ -99,6 +99,51 @@ private slots:
      */
     void about();
 
+    /**
+     * @brief Rotates the image clockwise
+     * 
+     */
+    void rotateClockwise();
+
+    /**
+     * @brief Rotates the image counterclockwise
+     * 
+     */
+    void rotateCounterClockwise();
+
+    /**
+     * @brief Rescales the image
+     * 
+     */
+    void rescaleImage();
+
+    /**
+     * @brief When the brightness slider is triggered
+     * 
+     */
+    void onAdjustImageBrightness();
+
+    /**
+     * @brief Adjusts the brightness of the image
+     * 
+     * @param brightnessFactor 
+     */
+    void adjustImageBrightness(int brightnessFactor);
+
+    /**
+     * @brief When the contrast slider is triggered
+     * 
+     * @param contrastFactor 
+     */
+    void onAdjustContrast();
+
+    /**
+     * @brief Adjusts the contrast of the image
+     * 
+     * @param contrastFactor 
+     */
+    void adjustContrast(int contrastFactor);
+
 private:
 
     /**
@@ -150,20 +195,38 @@ private:
      */
     void renderWorkArea();
 
+    /**
+     * @brief Updates the current image in the UI and private data structures
+     * 
+     * @param image The new image pointer
+     */
+    void updateCurrentImage(QImage *image);
+
     QImage *image;
     QListWidget *imagesList;
     std::map<QString, QImage> images;
+    std::map<QString, QString> imagesPath;
     QString currentFileName;
     QLabel *imageLabel;
     QScrollArea *scrollArea;
     double scaleFactor;
 
+    // File handling actions
     QAction *saveAct;
     QAction *saveAsAct;
     QAction *closeAct;
-    QAction *copyAct;
+
+    // View actions
     QAction *zoomInAct;
     QAction *zoomOutAct;
     QAction *normalSizeAct;
     QAction *fitToWindowAct;
+
+    // Edit Actions
+    QAction *copyAct;
+    QAction *rotateClockwiseAct;
+    QAction *rotateCounterClockwiseAct;
+    QAction *rescaleImageAct;
+    QAction *adjustImageBrightnessAct;
+    QAction *adjustContrastAct;
 };
