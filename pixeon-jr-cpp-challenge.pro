@@ -19,8 +19,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 # Input
-HEADERS += include/imageviewer.hpp
+HEADERS += include/imageviewer.hpp \
+           include/imageeditor.hpp
 SOURCES += src/imageviewer.cpp \
+           src/imageeditor.cpp \
            src/main.cpp
 
 QT += widgets

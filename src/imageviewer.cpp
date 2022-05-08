@@ -1,4 +1,5 @@
 #include "imageviewer.hpp"
+#include "imageeditor.hpp"
 #include <QGuiApplication>
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -85,11 +86,13 @@ void ImageViewer::open()
 void ImageViewer::close()
 {
     auto *imageWidget = imagesList->findItems(currentFileName, Qt::MatchExactly).first();
-    images.erase(imageWidget->text());
     imagesList->takeItem(imagesList->row(imageWidget));
+    images.erase(currentFileName);
+    imagesPath.erase(currentFileName);
 
     if (imagesList->count() == 0)
     {
+        image = new QImage();
         scrollArea->setVisible(false);
         imagesList->setVisible(false);
         updateActions();
@@ -105,19 +108,25 @@ void ImageViewer::close()
 
 void ImageViewer::save()
 {
-    while (!saveFile(this->currentFileName)) {}
+    while (!saveFile(imagesPath[currentFileName])) {}
 }
 
 void ImageViewer::saveAs()
 {
     QFileDialog dialog(this);
-    dialog.setDefaultSuffix("jpg");
-    QString saveFileName = dialog.getSaveFileName(this, "Save File As", this->currentFileName);
+    QString saveFilePath = dialog.getSaveFileName(this, "Save File As", this->currentFileName);
 
-    if (saveFileName.isNull())
+    // Dealing with possible filename changing
+    auto tmpImage = images[currentFileName];
+    images.erase(currentFileName);
+    currentFileName = saveFilePath.split('/').last();
+    images[currentFileName] = tmpImage;
+    imagesList->selectedItems().at(0)->setText(currentFileName);
+
+    if (saveFilePath.isNull())
         return;
 
-    while (!saveFile(saveFileName)) {}
+    while (!saveFile(saveFilePath)) {}
 }
 
 bool ImageViewer::loadFile(const QString &filePath)
@@ -135,6 +144,7 @@ bool ImageViewer::loadFile(const QString &filePath)
     }
 
     currentFileName = filePath.split('/').last();
+    imagesPath[currentFileName] = filePath;
     QListWidgetItem *newItem = new QListWidgetItem;
     newItem->setText(currentFileName);
     newItem->setIcon(QIcon(filePath));
@@ -315,13 +325,25 @@ void ImageViewer::createActions()
     QAction *pasteAct = editMenu->addAction(tr("&Paste"), this, &ImageViewer::paste);
     pasteAct->setShortcut(QKeySequence::Paste);
 
+    rotateClockwiseAct = editMenu->addAction(tr("Rotate Clockwise"),
+                                             this,
+                                             &ImageViewer::rotateClockwise);
+    rotateClockwiseAct->setShortcut(tr("Ctrl+R"));
+    rotateClockwiseAct->setEnabled(false);
+
+    rotateCounterClockwiseAct = editMenu->addAction(tr("Rotate Counterclockwise"),
+                                                    this,
+                                                    &ImageViewer::rotateCounterClockwise);
+    rotateCounterClockwiseAct->setShortcut(tr("Ctrl+Shift+R"));
+    rotateCounterClockwiseAct->setEnabled(false);
+
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 
-    zoomInAct = viewMenu->addAction(tr("Zoom &In (25%)"), this, &ImageViewer::zoomIn);
+    zoomInAct = viewMenu->addAction(tr("Zoom In (25%)"), this, &ImageViewer::zoomIn);
     zoomInAct->setShortcut(QKeySequence::ZoomIn);
     zoomInAct->setEnabled(false);
 
-    zoomOutAct = viewMenu->addAction(tr("Zoom &Out (25%)"), this, &ImageViewer::zoomOut);
+    zoomOutAct = viewMenu->addAction(tr("Zoom Out (25%)"), this, &ImageViewer::zoomOut);
     zoomOutAct->setShortcut(QKeySequence::ZoomOut);
     zoomOutAct->setEnabled(false);
 
@@ -348,6 +370,8 @@ void ImageViewer::updateActions()
     saveAsAct->setEnabled(!image->isNull());
     closeAct->setEnabled(!image->isNull());
     copyAct->setEnabled(!image->isNull());
+    rotateClockwiseAct->setEnabled(!image->isNull());
+    rotateCounterClockwiseAct->setEnabled(!image->isNull());
     zoomInAct->setEnabled(!fitToWindowAct->isChecked());
     zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
     normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
@@ -369,4 +393,18 @@ void ImageViewer::scaleImage(double factor)
 void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
 {
     scrollBar->setValue(int(factor * scrollBar->value() + ((factor - 1) * scrollBar->pageStep() / 2)));
+}
+
+void ImageViewer::rotateClockwise()
+{
+    ImageEditor::rotate(image, true);
+    images[currentFileName] = *image;
+    setImage(*image);
+}
+
+void ImageViewer::rotateCounterClockwise()
+{
+    ImageEditor::rotate(image, false);
+    images[currentFileName] = *image;
+    setImage(*image);
 }

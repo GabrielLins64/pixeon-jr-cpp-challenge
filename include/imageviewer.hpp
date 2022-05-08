@@ -99,6 +99,18 @@ private slots:
      */
     void about();
 
+    /**
+     * @brief Rotates the image clockwise
+     * 
+     */
+    void rotateClockwise();
+
+    /**
+     * @brief Rotates the image counterclockwise
+     * 
+     */
+    void rotateCounterClockwise();
+
 private:
 
     /**
@@ -153,17 +165,25 @@ private:
     QImage *image;
     QListWidget *imagesList;
     std::map<QString, QImage> images;
+    std::map<QString, QString> imagesPath;
     QString currentFileName;
     QLabel *imageLabel;
     QScrollArea *scrollArea;
     double scaleFactor;
 
+    // File handling actions
     QAction *saveAct;
     QAction *saveAsAct;
     QAction *closeAct;
-    QAction *copyAct;
+
+    // View actions
     QAction *zoomInAct;
     QAction *zoomOutAct;
     QAction *normalSizeAct;
     QAction *fitToWindowAct;
+
+    // Edit Actions
+    QAction *copyAct;
+    QAction *rotateClockwiseAct;
+    QAction *rotateCounterClockwiseAct;
 };

@@ -53,8 +53,10 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = src/imageviewer.cpp \
+		src/imageeditor.cpp \
 		src/main.cpp moc_imageviewer.cpp
 OBJECTS       = imageviewer.o \
+		imageeditor.o \
 		main.o \
 		moc_imageviewer.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -132,7 +134,9 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/exceptions.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
-		pixeon-jr-cpp-challenge.pro include/imageviewer.hpp src/imageviewer.cpp \
+		pixeon-jr-cpp-challenge.pro include/imageviewer.hpp \
+		include/imageeditor.hpp src/imageviewer.cpp \
+		src/imageeditor.cpp \
 		src/main.cpp
 QMAKE_TARGET  = main
 DESTDIR       = build/
@@ -314,8 +318,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents include/imageviewer.hpp $(DISTDIR)/
-	$(COPY_FILE) --parents src/imageviewer.cpp src/main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/imageviewer.hpp include/imageeditor.hpp $(DISTDIR)/
+	$(COPY_FILE) --parents src/imageviewer.cpp src/imageeditor.cpp src/main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -371,8 +375,12 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean
 
 ####### Compile
 
-imageviewer.o: src/imageviewer.cpp include/imageviewer.hpp
+imageviewer.o: src/imageviewer.cpp include/imageviewer.hpp \
+		include/imageeditor.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o imageviewer.o src/imageviewer.cpp
+
+imageeditor.o: src/imageeditor.cpp include/imageeditor.hpp
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o imageeditor.o src/imageeditor.cpp
 
 main.o: src/main.cpp include/imageviewer.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o src/main.cpp
