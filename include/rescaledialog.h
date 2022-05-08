@@ -4,16 +4,16 @@
 #include <QDialog>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class rescaleDialog; }
+namespace Ui { class RescaleDialog; }
 QT_END_NAMESPACE
 
-class rescaleDialog : public QDialog
+class RescaleDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    rescaleDialog(QWidget *parent = nullptr);
-    ~rescaleDialog();
+    RescaleDialog(QWidget *parent = nullptr);
+    ~RescaleDialog();
 
     double getRescaleFactor();
 
@@ -21,6 +21,6 @@ private slots:
     void on_horizontalSlider_valueChanged(int position);
 
 private:
-    Ui::rescaleDialog *ui;
+    Ui::RescaleDialog *ui;
 };
 #endif // RESCALEDIALOG_H

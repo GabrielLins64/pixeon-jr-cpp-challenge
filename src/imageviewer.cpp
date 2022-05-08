@@ -427,7 +427,7 @@ void ImageViewer::rotateCounterClockwise()
 
 void ImageViewer::rescaleImage()
 {
-    rescaleDialog *rescDialog = new rescaleDialog();
+    RescaleDialog *rescDialog = new RescaleDialog();
     
     if (rescDialog->exec())
     {

@@ -1,27 +1,27 @@
 #include "rescaledialog.h"
 #include "ui_rescaledialog.h"
 
-rescaleDialog::rescaleDialog(QWidget *parent)
+RescaleDialog::RescaleDialog(QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::rescaleDialog)
+    , ui(new Ui::RescaleDialog)
 {
     ui->setupUi(this);
     this->setFixedSize(QSize(350,200));
 }
 
-rescaleDialog::~rescaleDialog()
+RescaleDialog::~RescaleDialog()
 {
     delete ui;
 }
 
 
-void rescaleDialog::on_horizontalSlider_valueChanged(int position)
+void RescaleDialog::on_horizontalSlider_valueChanged(int position)
 {
     double newScale = (double)position / 100.0;
     ui->scaleLabel->setNum(newScale);
 }
 
-double rescaleDialog::getRescaleFactor()
+double RescaleDialog::getRescaleFactor()
 {
     return ui->scaleLabel->text().toDouble();
 }
