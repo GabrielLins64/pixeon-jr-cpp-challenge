@@ -111,6 +111,12 @@ private slots:
      */
     void rotateCounterClockwise();
 
+    /**
+     * @brief Rescales the image
+     * 
+     */
+    void rescaleImage();
+
 private:
 
     /**
@@ -162,6 +168,13 @@ private:
      */
     void renderWorkArea();
 
+    /**
+     * @brief Updates the current image in the UI and private data structures
+     * 
+     * @param image The new image pointer
+     */
+    void updateCurrentImage(QImage *image);
+
     QImage *image;
     QListWidget *imagesList;
     std::map<QString, QImage> images;
@@ -186,4 +199,5 @@ private:
     QAction *copyAct;
     QAction *rotateClockwiseAct;
     QAction *rotateCounterClockwiseAct;
+    QAction *rescaleImageAct;
 };

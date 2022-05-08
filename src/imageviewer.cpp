@@ -1,5 +1,6 @@
 #include "imageviewer.hpp"
 #include "imageeditor.hpp"
+#include "rescaledialog.h"
 #include <QGuiApplication>
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -337,6 +338,10 @@ void ImageViewer::createActions()
     rotateCounterClockwiseAct->setShortcut(tr("Ctrl+Shift+R"));
     rotateCounterClockwiseAct->setEnabled(false);
 
+    rescaleImageAct = editMenu->addAction(tr("Rescale"), this, &ImageViewer::rescaleImage);
+    rescaleImageAct->setShortcut(tr("Ctrl+H"));
+    rescaleImageAct->setEnabled(false);
+
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 
     zoomInAct = viewMenu->addAction(tr("Zoom In (25%)"), this, &ImageViewer::zoomIn);
@@ -372,6 +377,7 @@ void ImageViewer::updateActions()
     copyAct->setEnabled(!image->isNull());
     rotateClockwiseAct->setEnabled(!image->isNull());
     rotateCounterClockwiseAct->setEnabled(!image->isNull());
+    rescaleImageAct->setEnabled(!image->isNull());
     zoomInAct->setEnabled(!fitToWindowAct->isChecked());
     zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
     normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
@@ -395,16 +401,32 @@ void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
     scrollBar->setValue(int(factor * scrollBar->value() + ((factor - 1) * scrollBar->pageStep() / 2)));
 }
 
+void ImageViewer::updateCurrentImage(QImage *image)
+{
+    images[currentFileName] = *image;
+    setImage(*image);
+}
+
 void ImageViewer::rotateClockwise()
 {
     ImageEditor::rotate(image, true);
-    images[currentFileName] = *image;
-    setImage(*image);
+    updateCurrentImage(image);
 }
 
 void ImageViewer::rotateCounterClockwise()
 {
     ImageEditor::rotate(image, false);
-    images[currentFileName] = *image;
-    setImage(*image);
+    updateCurrentImage(image);
+}
+
+void ImageViewer::rescaleImage()
+{
+    rescaleDialog *rescDialog = new rescaleDialog();
+    
+    if (rescDialog->exec())
+    {
+        double rescaleFactor = rescDialog->getRescaleFactor();
+        ImageEditor::rescale(image, rescaleFactor);
+        updateCurrentImage(image);
+    }
 }
