@@ -1,6 +1,7 @@
 #include "imageviewer.hpp"
 #include "imageeditor.hpp"
 #include "rescaledialog.h"
+#include "brightnessdialog.h"
 #include <QGuiApplication>
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -342,6 +343,10 @@ void ImageViewer::createActions()
     rescaleImageAct->setShortcut(tr("Ctrl+H"));
     rescaleImageAct->setEnabled(false);
 
+    adjustImageBrightnessAct = editMenu->addAction(tr("Adjust Brightness"), this, &ImageViewer::onAdjustImageBrightness);
+    adjustImageBrightnessAct->setShortcut(tr("Ctrl+B"));
+    adjustImageBrightnessAct->setEnabled(false);
+
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 
     zoomInAct = viewMenu->addAction(tr("Zoom In (25%)"), this, &ImageViewer::zoomIn);
@@ -378,6 +383,7 @@ void ImageViewer::updateActions()
     rotateClockwiseAct->setEnabled(!image->isNull());
     rotateCounterClockwiseAct->setEnabled(!image->isNull());
     rescaleImageAct->setEnabled(!image->isNull());
+    adjustImageBrightnessAct->setEnabled(!image->isNull());
     zoomInAct->setEnabled(!fitToWindowAct->isChecked());
     zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
     normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
@@ -429,4 +435,33 @@ void ImageViewer::rescaleImage()
         ImageEditor::rescale(image, rescaleFactor);
         updateCurrentImage(image);
     }
+}
+
+void ImageViewer::onAdjustImageBrightness()
+{
+    BrightnessDialog *brightnessDialog = new BrightnessDialog();
+
+    connect(brightnessDialog->brightnessSlider,
+            &QAbstractSlider::valueChanged,
+            this,
+            &ImageViewer::adjustImageBrightness);
+    
+    if (brightnessDialog->exec())
+    {
+        int brightnessFactor = brightnessDialog->getBrightnessFactor();
+        ImageEditor::brightness(image, (double) brightnessFactor / 100.0);
+        updateCurrentImage(image);
+    }
+    else
+    {
+        setImage(*image);
+    }
+}
+
+void ImageViewer::adjustImageBrightness(int brightnessFactor)
+{
+    QImage original = image->copy();
+    ImageEditor::brightness(image, (double) brightnessFactor / 100.0);
+    setImage(*image);
+    *image = original;
 }

@@ -29,7 +29,7 @@ public:
      * @param image Image that the brightness will be adjusted
      * @param factor Factor of adjustment
      */
-    static void brightness(QImage *image, int factor);
+    static void brightness(QImage *image, double brightnessFactor);
 
     /**
      * @brief Adjust the image contrast

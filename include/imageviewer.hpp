@@ -117,6 +117,19 @@ private slots:
      */
     void rescaleImage();
 
+    /**
+     * @brief When the brightness slider is triggered
+     * 
+     */
+    void onAdjustImageBrightness();
+
+    /**
+     * @brief Adjusts the brightness of the image
+     * 
+     * @param brightnessFactor 
+     */
+    void adjustImageBrightness(int brightnessFactor);
+
 private:
 
     /**
@@ -200,4 +213,5 @@ private:
     QAction *rotateClockwiseAct;
     QAction *rotateCounterClockwiseAct;
     QAction *rescaleImageAct;
+    QAction *adjustImageBrightnessAct;
 };

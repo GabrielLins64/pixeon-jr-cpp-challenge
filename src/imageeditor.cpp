@@ -18,7 +18,21 @@ void ImageEditor::rotate(QImage *image, bool clockwise)
     *image = image->transformed(auxMatrix);
 }
 
-void ImageEditor::brightness(QImage *image, int factor) {}
+void ImageEditor::brightness(QImage *image, double brightnessFactor) 
+{
+    double r, g, b;
+    int pixels = image->width() * image->height();
+    unsigned int *data = (unsigned int *)image->bits();
+    for (int i = 0; i < pixels; ++i) {
+        r = qRed(data[i]) + (brightnessFactor * 255.0 - 128.0);
+        r = (r < 0x00) ? 0x00 : (r > 0xff) ? 0xff : r;
+        g = qGreen(data[i]) + (brightnessFactor * 255.0 - 128.0);
+        g = (g < 0x00) ? 0x00 : (g > 0xff) ? 0xff : g;
+        b = qBlue(data[i]) + (brightnessFactor * 255.0 - 128.0);
+        b = (b < 0x00) ? 0x00 : (b > 0xff) ? 0xff : b;
+        data[i] = qRgba(r, g, b, qAlpha(data[i]));
+    }
+}
 
 void ImageEditor::contrast(QImage *image, int factor)
 {
@@ -32,10 +46,10 @@ void ImageEditor::contrast(QImage *image, int factor)
     for (int i = 0; i < pixels; ++i) {
         r = 128 + contrast * (qRed(data[i]) - 128);
         r = (r < 0x00) ? 0x00 : (r > 0xff) ? 0xff : r;
-        g= 128+ contrast*(qGreen(data[i]) - 128);
+        g = 128 + contrast * (qGreen(data[i]) - 128);
         g = (g < 0x00) ? 0x00 : (g > 0xff) ? 0xff : g;
-        b= 128+ contrast*(qBlue(data[i]) - 128);
-        b =  (b  < 0x00) ? 0x00 : (b  > 0xff) ? 0xff : b ;
+        b = 128 + contrast * (qBlue(data[i]) - 128);
+        b = (b < 0x00) ? 0x00 : (b > 0xff) ? 0xff : b;
         data[i] = qRgba(r, g, b, qAlpha(data[i]));
     }
 }
