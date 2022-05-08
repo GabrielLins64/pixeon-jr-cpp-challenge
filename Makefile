@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_DEPRECATED_WARNINGS -DQT_NO_DEBUG -DQT_PRINTSUPPORT_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -O2 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -I. -I. -Iinclude -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtPrintSupport -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
+INCPATH       = -I. -I. -Iinclude -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtPrintSupport -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I. -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -54,11 +54,15 @@ OBJECTS_DIR   = ./
 
 SOURCES       = src/imageviewer.cpp \
 		src/imageeditor.cpp \
-		src/main.cpp moc_imageviewer.cpp
+		src/rescaledialog.cpp \
+		src/main.cpp moc_imageviewer.cpp \
+		moc_rescaledialog.cpp
 OBJECTS       = imageviewer.o \
 		imageeditor.o \
+		rescaledialog.o \
 		main.o \
-		moc_imageviewer.o
+		moc_imageviewer.o \
+		moc_rescaledialog.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -135,8 +139,10 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		pixeon-jr-cpp-challenge.pro include/imageviewer.hpp \
-		include/imageeditor.hpp src/imageviewer.cpp \
+		include/imageeditor.hpp \
+		include/rescaledialog.h src/imageviewer.cpp \
 		src/imageeditor.cpp \
+		src/rescaledialog.cpp \
 		src/main.cpp
 QMAKE_TARGET  = main
 DESTDIR       = build/
@@ -146,7 +152,7 @@ TARGET        = build/main
 first: all
 ####### Build rules
 
-build/main:  $(OBJECTS)  
+build/main: ui_rescaledialog.h $(OBJECTS)  
 	@test -d build/ || mkdir -p build/
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
@@ -318,8 +324,9 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents include/imageviewer.hpp include/imageeditor.hpp $(DISTDIR)/
-	$(COPY_FILE) --parents src/imageviewer.cpp src/imageeditor.cpp src/main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents include/imageviewer.hpp include/imageeditor.hpp include/rescaledialog.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/imageviewer.cpp src/imageeditor.cpp src/rescaledialog.cpp src/main.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents assets/designs/rescaledialog.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -351,42 +358,60 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -Wall -W -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_imageviewer.cpp
+compiler_moc_header_make_all: moc_imageviewer.cpp moc_rescaledialog.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_imageviewer.cpp
+	-$(DEL_FILE) moc_imageviewer.cpp moc_rescaledialog.cpp
 moc_imageviewer.cpp: include/imageviewer.hpp \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/gabriellins/Computacao/Ofício/dev-processos-seletivos/pixeon/pixeon-jr-cpp-challenge/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/gabriellins/Computacao/Ofício/dev-processos-seletivos/pixeon/pixeon-jr-cpp-challenge -I/home/gabriellins/Computacao/Ofício/dev-processos-seletivos/pixeon/pixeon-jr-cpp-challenge -I/home/gabriellins/Computacao/Ofício/dev-processos-seletivos/pixeon/pixeon-jr-cpp-challenge/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtPrintSupport -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/imageviewer.hpp -o moc_imageviewer.cpp
 
+moc_rescaledialog.cpp: include/rescaledialog.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/gabriellins/Computacao/Ofício/dev-processos-seletivos/pixeon/pixeon-jr-cpp-challenge/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/gabriellins/Computacao/Ofício/dev-processos-seletivos/pixeon/pixeon-jr-cpp-challenge -I/home/gabriellins/Computacao/Ofício/dev-processos-seletivos/pixeon/pixeon-jr-cpp-challenge -I/home/gabriellins/Computacao/Ofício/dev-processos-seletivos/pixeon/pixeon-jr-cpp-challenge/include -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtPrintSupport -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include include/rescaledialog.h -o moc_rescaledialog.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all:
+compiler_uic_make_all: ui_rescaledialog.h
 compiler_uic_clean:
+	-$(DEL_FILE) ui_rescaledialog.h
+ui_rescaledialog.h: assets/designs/rescaledialog.ui \
+		/usr/lib/qt5/bin/uic
+	/usr/lib/qt5/bin/uic assets/designs/rescaledialog.ui -o ui_rescaledialog.h
+
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
 compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean 
+compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
 
 imageviewer.o: src/imageviewer.cpp include/imageviewer.hpp \
-		include/imageeditor.hpp
+		include/imageeditor.hpp \
+		include/rescaledialog.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o imageviewer.o src/imageviewer.cpp
 
 imageeditor.o: src/imageeditor.cpp include/imageeditor.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o imageeditor.o src/imageeditor.cpp
+
+rescaledialog.o: src/rescaledialog.cpp include/rescaledialog.h \
+		ui_rescaledialog.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rescaledialog.o src/rescaledialog.cpp
 
 main.o: src/main.cpp include/imageviewer.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o src/main.cpp
 
 moc_imageviewer.o: moc_imageviewer.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_imageviewer.o moc_imageviewer.cpp
+
+moc_rescaledialog.o: moc_rescaledialog.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_rescaledialog.o moc_rescaledialog.cpp
 
 ####### Install
 

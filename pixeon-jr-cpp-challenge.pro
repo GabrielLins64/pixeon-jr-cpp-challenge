@@ -20,11 +20,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 # Input
 HEADERS += include/imageviewer.hpp \
-           include/imageeditor.hpp
+           include/imageeditor.hpp \
+           include/rescaledialog.h
 SOURCES += src/imageviewer.cpp \
            src/imageeditor.cpp \
+           src/rescaledialog.cpp \
            src/main.cpp
 
-QT += widgets
+FORMS += assets/designs/rescaledialog.ui
+
+QT += widgets core gui
 requires(qtConfig(filedialog))
 qtHaveModule(printsupport): QT += printsupport
