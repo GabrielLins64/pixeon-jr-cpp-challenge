@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QPrinter>
+#include <map>
 
 class ImageViewer : public QMainWindow
 {
@@ -21,6 +22,14 @@ public:
      * @return false 
      */
     bool loadFile(const QString &);
+
+protected slots:
+    /**
+     * @brief When a image on the images list is clicked
+     * 
+     * @param clickedItem 
+     */
+    void onImagesListItemClicked(QListWidgetItem *clickedItem);
 
 private slots:
 
@@ -135,7 +144,15 @@ private:
      */
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
 
+    /**
+     * @brief Renders the work area (images list and image viewer)
+     * 
+     */
+    void renderWorkArea();
+
     QImage *image;
+    QListWidget *imagesList;
+    std::map<QString, QImage> images;
     QString currentFileName;
     QLabel *imageLabel;
     QScrollArea *scrollArea;

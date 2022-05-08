@@ -5,9 +5,23 @@
 #include <QImageReader>
 #include <QImageWriter>
 #include <QMessageBox>
+#include <QStatusBar>
 
 ImageViewer::ImageViewer()
-    : imageLabel(new QLabel), scrollArea(new QScrollArea), scaleFactor(1)
+    : imagesList(new QListWidget),
+      imageLabel(new QLabel),
+      scrollArea(new QScrollArea),
+      scaleFactor(1)
+{
+    renderWorkArea();
+
+    createActions();
+    resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
+
+    statusBar()->showMessage("Welcome to the Pixeon Challenge's Image Viewer!", 3000);
+}
+
+void ImageViewer::renderWorkArea()
 {
     const QString mainCss = "QMainWindow {"
                             "    background-image: url('assets/images/logo-pixeon.png');"
@@ -24,11 +38,23 @@ ImageViewer::ImageViewer()
     scrollArea->setBackgroundRole(QPalette::Dark);
     scrollArea->setWidget(imageLabel);
     scrollArea->setVisible(false);
-    setCentralWidget(scrollArea);
 
-    createActions();
+    imagesList->setFixedWidth(200);
+    imagesList->setIconSize(QSize(50,50));
+    imagesList->setVisible(false);
 
-    resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(imagesList);
+    layout->addWidget(scrollArea);
+
+    QWidget *window = new QWidget();
+    window->setLayout(layout);
+    setCentralWidget(window);
+
+    connect(imagesList,
+            &QListWidget::itemClicked,
+            this,
+            &ImageViewer::onImagesListItemClicked);
 }
 
 static void initializeImageFileDialog(QFileDialog &dialog)
@@ -58,10 +84,23 @@ void ImageViewer::open()
 
 void ImageViewer::close()
 {
-    delete image;
-    image = new QImage();
-    scrollArea->setVisible(false);
-    updateActions();
+    auto *imageWidget = imagesList->findItems(currentFileName, Qt::MatchExactly).first();
+    images.erase(imageWidget->text());
+    imagesList->takeItem(imagesList->row(imageWidget));
+
+    if (imagesList->count() == 0)
+    {
+        scrollArea->setVisible(false);
+        imagesList->setVisible(false);
+        updateActions();
+    }
+    else
+    {
+        QListWidgetItem *lastItem = imagesList->item(0);
+        imagesList->setCurrentRow(0);
+        currentFileName = lastItem->text();
+        setImage(images[lastItem->text()]);
+    }
 }
 
 void ImageViewer::save()
@@ -75,16 +114,15 @@ void ImageViewer::saveAs()
     dialog.setDefaultSuffix("jpg");
     QString saveFileName = dialog.getSaveFileName(this, "Save File As", this->currentFileName);
 
-    if(saveFileName.isNull())
+    if (saveFileName.isNull())
         return;
 
     while (!saveFile(saveFileName)) {}
 }
 
-bool ImageViewer::loadFile(const QString &fileName)
+bool ImageViewer::loadFile(const QString &filePath)
 {
-    QImageReader reader(fileName);
-    this->currentFileName = fileName;
+    QImageReader reader(filePath);
 
     reader.setAutoTransform(true);
     const QImage newImage = reader.read();
@@ -92,21 +130,38 @@ bool ImageViewer::loadFile(const QString &fileName)
     {
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
                                  tr("Cannot load %1: %2")
-                                     .arg(QDir::toNativeSeparators(fileName), reader.errorString()));
+                                     .arg(QDir::toNativeSeparators(filePath), reader.errorString()));
         return false;
     }
 
+    currentFileName = filePath.split('/').last();
+    QListWidgetItem *newItem = new QListWidgetItem;
+    newItem->setText(currentFileName);
+    newItem->setIcon(QIcon(filePath));
+    imagesList->addItem(newItem);
+    imagesList->setItemSelected(newItem, true);
+    images[currentFileName] = newImage;
+
     setImage(newImage);
 
-    setWindowFilePath(fileName);
+    setWindowFilePath(filePath);
 
     const QString message = tr("Opened \"%1\", %2x%3, Depth: %4")
-                                .arg(QDir::toNativeSeparators(fileName))
+                                .arg(QDir::toNativeSeparators(filePath))
                                 .arg(image->width())
                                 .arg(image->height())
                                 .arg(image->depth());
     statusBar()->showMessage(message);
     return true;
+}
+
+void ImageViewer::onImagesListItemClicked(QListWidgetItem *clickedItem)
+{
+    QString imageName = clickedItem->text();
+    QImage selectedImage = images[imageName];
+    currentFileName = imageName;
+
+    setImage(selectedImage);
 }
 
 void ImageViewer::setImage(const QImage &newImage)
@@ -116,6 +171,7 @@ void ImageViewer::setImage(const QImage &newImage)
     scaleFactor = 1.0;
 
     scrollArea->setVisible(true);
+    imagesList->setVisible(true);
     fitToWindowAct->setEnabled(true);
     updateActions();
 
