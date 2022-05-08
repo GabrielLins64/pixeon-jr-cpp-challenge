@@ -2,6 +2,7 @@
 #include "imageeditor.hpp"
 #include "rescaledialog.h"
 #include "brightnessdialog.h"
+#include "contrastdialog.h"
 #include <QGuiApplication>
 #include <QFileDialog>
 #include <QStandardPaths>
@@ -347,6 +348,10 @@ void ImageViewer::createActions()
     adjustImageBrightnessAct->setShortcut(tr("Ctrl+B"));
     adjustImageBrightnessAct->setEnabled(false);
 
+    adjustContrastAct = editMenu->addAction(tr("Adjust Contrast"), this, &ImageViewer::onAdjustContrast);
+    adjustContrastAct->setShortcut(tr("Ctrl+T"));
+    adjustContrastAct->setEnabled(false);
+
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
 
     zoomInAct = viewMenu->addAction(tr("Zoom In (25%)"), this, &ImageViewer::zoomIn);
@@ -384,6 +389,7 @@ void ImageViewer::updateActions()
     rotateCounterClockwiseAct->setEnabled(!image->isNull());
     rescaleImageAct->setEnabled(!image->isNull());
     adjustImageBrightnessAct->setEnabled(!image->isNull());
+    adjustContrastAct->setEnabled(!image->isNull());
     zoomInAct->setEnabled(!fitToWindowAct->isChecked());
     zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
     normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
@@ -462,6 +468,34 @@ void ImageViewer::adjustImageBrightness(int brightnessFactor)
 {
     QImage original = image->copy();
     ImageEditor::brightness(image, (double) brightnessFactor / 100.0);
+    setImage(*image);
+    *image = original;
+}
+
+void ImageViewer::onAdjustContrast()
+{
+    ContrastDialog *contrastDialog = new ContrastDialog();
+
+    connect(contrastDialog->contrastSlider,
+            &QAbstractSlider::valueChanged,
+            this,
+            &ImageViewer::adjustContrast);
+    
+    if (contrastDialog->exec())
+    {
+        ImageEditor::contrast(image, contrastDialog->getContrastFactor());
+        updateCurrentImage(image);
+    }
+    else
+    {
+        setImage(*image);
+    }
+}
+
+void ImageViewer::adjustContrast(int contrastFactor)
+{
+    QImage original = image->copy();
+    ImageEditor::contrast(image, contrastFactor);
     setImage(*image);
     *image = original;
 }

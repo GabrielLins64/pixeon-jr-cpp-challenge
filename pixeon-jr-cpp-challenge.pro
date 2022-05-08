@@ -22,15 +22,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 HEADERS += include/imageviewer.hpp \
            include/imageeditor.hpp \
            include/rescaledialog.h \
-           include/brightnessdialog.h
+           include/brightnessdialog.h \
+           include/contrastdialog.h
 SOURCES += src/imageviewer.cpp \
            src/imageeditor.cpp \
            src/rescaledialog.cpp \
            src/brightnessdialog.cpp \
+           src/contrastdialog.cpp \
            src/main.cpp
 
 FORMS += assets/designs/rescaledialog.ui \
-         assets/designs/brightnessdialog.ui
+         assets/designs/brightnessdialog.ui \
+         assets/designs/contrastdialog.ui
 
 QT += widgets core gui
 requires(qtConfig(filedialog))

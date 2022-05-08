@@ -130,6 +130,20 @@ private slots:
      */
     void adjustImageBrightness(int brightnessFactor);
 
+    /**
+     * @brief When the contrast slider is triggered
+     * 
+     * @param contrastFactor 
+     */
+    void onAdjustContrast();
+
+    /**
+     * @brief Adjusts the contrast of the image
+     * 
+     * @param contrastFactor 
+     */
+    void adjustContrast(int contrastFactor);
+
 private:
 
     /**
@@ -214,4 +228,5 @@ private:
     QAction *rotateCounterClockwiseAct;
     QAction *rescaleImageAct;
     QAction *adjustImageBrightnessAct;
+    QAction *adjustContrastAct;
 };
