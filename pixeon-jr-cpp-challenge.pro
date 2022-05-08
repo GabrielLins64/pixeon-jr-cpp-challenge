@@ -23,7 +23,8 @@ HEADERS += include/imageviewer.hpp \
            include/imageeditor.hpp \
            include/rescaledialog.h \
            include/brightnessdialog.h \
-           include/contrastdialog.h
+           include/contrastdialog.h \
+           include/texts.hpp
 SOURCES += src/imageviewer.cpp \
            src/imageeditor.cpp \
            src/rescaledialog.cpp \

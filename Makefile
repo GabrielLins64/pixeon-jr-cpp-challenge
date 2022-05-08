@@ -150,7 +150,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		include/imageeditor.hpp \
 		include/rescaledialog.h \
 		include/brightnessdialog.h \
-		include/contrastdialog.h src/imageviewer.cpp \
+		include/contrastdialog.h \
+		include/texts.hpp src/imageviewer.cpp \
 		src/imageeditor.cpp \
 		src/rescaledialog.cpp \
 		src/brightnessdialog.cpp \
@@ -336,7 +337,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents include/imageviewer.hpp include/imageeditor.hpp include/rescaledialog.h include/brightnessdialog.h include/contrastdialog.h $(DISTDIR)/
+	$(COPY_FILE) --parents include/imageviewer.hpp include/imageeditor.hpp include/rescaledialog.h include/brightnessdialog.h include/contrastdialog.h include/texts.hpp $(DISTDIR)/
 	$(COPY_FILE) --parents src/imageviewer.cpp src/imageeditor.cpp src/rescaledialog.cpp src/brightnessdialog.cpp src/contrastdialog.cpp src/main.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents assets/designs/rescaledialog.ui assets/designs/brightnessdialog.ui assets/designs/contrastdialog.ui $(DISTDIR)/
 
@@ -426,7 +427,8 @@ imageviewer.o: src/imageviewer.cpp include/imageviewer.hpp \
 		include/imageeditor.hpp \
 		include/rescaledialog.h \
 		include/brightnessdialog.h \
-		include/contrastdialog.h
+		include/contrastdialog.h \
+		include/texts.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o imageviewer.o src/imageviewer.cpp
 
 imageeditor.o: src/imageeditor.cpp include/imageeditor.hpp
