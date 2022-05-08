@@ -1,8 +1,15 @@
-#include <iostream>
+#include <QApplication>
+#include <QCommandLineParser>
 
-int main(int argc, char const *argv[])
+#include "imageviewer.hpp"
+
+int main(int argc, char *argv[])
 {
-    std::cout << "Hello, world!" << std::endl;
+    QApplication app(argc, argv);
+    QGuiApplication::setApplicationDisplayName(ImageViewer::tr("Pixeon Image Viewer"));
 
-    return 0;
+    ImageViewer imageViewer;
+
+    imageViewer.show();
+    return app.exec();
 }
