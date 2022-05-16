@@ -45,7 +45,7 @@ void ImageViewer::renderWorkArea()
     scrollArea->setVisible(false);
 
     imagesList->setFixedWidth(200);
-    imagesList->setIconSize(QSize(50,50));
+    imagesList->setIconSize(QSize(50, 50));
     imagesList->setVisible(false);
 
     QHBoxLayout *layout = new QHBoxLayout;
@@ -84,7 +84,8 @@ void ImageViewer::open()
     QFileDialog dialog(this, tr(OPEN_FILE_MSG));
     initializeImageFileDialog(dialog);
 
-    while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) {}
+    while (dialog.exec() == QDialog::Accepted && !loadFile(dialog.selectedFiles().first())) 
+        continue;
 }
 
 void ImageViewer::close()
@@ -112,7 +113,8 @@ void ImageViewer::close()
 
 void ImageViewer::save()
 {
-    while (!saveFile(imagesPath[currentFileName])) {}
+    while (!saveFile(imagesPath[currentFileName]))
+        continue;
 }
 
 void ImageViewer::saveAs()
@@ -130,7 +132,8 @@ void ImageViewer::saveAs()
     if (saveFilePath.isNull())
         return;
 
-    while (!saveFile(saveFilePath)) {}
+    while (!saveFile(saveFilePath))
+        continue;
 }
 
 bool ImageViewer::loadFile(const QString &filePath)
@@ -432,7 +435,7 @@ void ImageViewer::rotateCounterClockwise()
 void ImageViewer::rescaleImage()
 {
     RescaleDialog *rescDialog = new RescaleDialog();
-    
+
     if (rescDialog->exec())
     {
         double rescaleFactor = rescDialog->getRescaleFactor();
@@ -449,11 +452,11 @@ void ImageViewer::onAdjustImageBrightness()
             &QAbstractSlider::valueChanged,
             this,
             &ImageViewer::adjustImageBrightness);
-    
+
     if (brightnessDialog->exec())
     {
         int brightnessFactor = brightnessDialog->getBrightnessFactor();
-        ImageEditor::brightness(image, (double) brightnessFactor / 100.0);
+        ImageEditor::brightness(image, (double)brightnessFactor / 100.0);
         updateCurrentImage(image);
     }
     else
@@ -465,7 +468,7 @@ void ImageViewer::onAdjustImageBrightness()
 void ImageViewer::adjustImageBrightness(int brightnessFactor)
 {
     QImage original = image->copy();
-    ImageEditor::brightness(image, (double) brightnessFactor / 100.0);
+    ImageEditor::brightness(image, (double)brightnessFactor / 100.0);
     setImage(*image);
     *image = original;
 }
@@ -478,7 +481,7 @@ void ImageViewer::onAdjustContrast()
             &QAbstractSlider::valueChanged,
             this,
             &ImageViewer::adjustContrast);
-    
+
     if (contrastDialog->exec())
     {
         ImageEditor::contrast(image, contrastDialog->getContrastFactor());
